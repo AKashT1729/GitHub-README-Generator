@@ -2,9 +2,12 @@ import React from 'react'
 
 const ReadmeTemplate = () => {
   return (
-    <div>
-      
-    </div>
+   <>
+    <h1>Welcome to My Project</h1>
+    <p>This is a simple README.md generator for your GitHub repositories.</p>
+    <h2>Features</h2>
+    
+   </>
   )
 }
 

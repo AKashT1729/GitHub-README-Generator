@@ -1,6 +1,8 @@
 import { useState } from "react";
 import "./App.css";
 import InputForm from "./components/InputForm";
+import Preview from "./components/Preview";
+import ReadmeTemplate from "./components/ReadmeTemplate";
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -11,9 +13,9 @@ function App() {
 
   return (
     <>
-      <div className={`${darkMode ? "dark" : ""}`}>
+      <div className={`${darkMode ? "dark" : ""} `}>
         <main className="text-gray-800 dark:text-white dark:bg-gray-800 w-dvw h-dvh">
-          <div className="bg-white dark:bg-gray-900 w-full justify-center">
+          
             <div className="absolute top-4 right-4 flex items-center">
               <label htmlFor="dark-toggle" className="flex items-center cursor-pointer">
                 <div className="relative">
@@ -36,8 +38,10 @@ function App() {
                 
               </label>
             </div>
-          </div>
+          
           <InputForm />
+          <Preview/>
+          
         </main>
       </div>
     </>
