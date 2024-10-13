@@ -11,9 +11,9 @@ function App() {
 
   return (
     <>
-      <div className={`${darkMode && "dark"} `}>
+      <div className={`${darkMode ? "dark" : ""}`}>
         <main className="text-gray-800 dark:text-white dark:bg-gray-800 w-dvw h-dvh">
-          <div className= "bg-white dark:bg-gray-900 w-full justify-center">
+          <div className="bg-white dark:bg-gray-900 w-full justify-center">
             <div className="absolute top-4 right-4 flex items-center">
               <label htmlFor="dark-toggle" className="flex items-center cursor-pointer">
                 <div className="relative">
@@ -21,15 +21,19 @@ function App() {
                     type="checkbox"
                     name="dark-mode"
                     id="dark-toggle"
-                    className="checkbox hidden"
+                    className="sr-only"
                     onChange={toggleDarkMode}
                   />
-                  <div className="block border-[1px] dark:border-white border-gray-900 w-14 h-8 rounded-full"></div>
-                  <div className="dot absolute left-1 top-1 dark:bg-white bg-gray-800 w-6 h-6 rounded-full transition"></div>
+                  {/* Toggle background */}
+                  <div className="block w-14 h-8 rounded-full bg-gray-400 dark:bg-gray-700"></div>
+                  {/* Dot */}
+                  <div
+                    className={`dot absolute left-1 top-1 w-6 h-6 rounded-full transition transform ${
+                      darkMode ? "translate-x-6 bg-gray-200" : "bg-gray-800"
+                    }`}
+                  ></div>
                 </div>
-                <div className="ml-3 dark:text-white text-gray-900 font-medium">
-                  Dark Mode
-                </div>
+                
               </label>
             </div>
           </div>

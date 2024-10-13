@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-*{
-    @apply: transition-color duration-200
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  @apply: transition-color duration-200;
 }
