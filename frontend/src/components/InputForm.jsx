@@ -20,7 +20,7 @@ const InputForm = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8000/api/generateReadme",
+        "http://localhost:3000/api/generate-readme",
         {
           repoLink,
         }
