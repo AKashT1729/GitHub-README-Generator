@@ -17,54 +17,88 @@ const fetchRepoData = async (repoUrl) => {
     const repoResponse = await axios.get(repoApiUrl, { headers });
     const repoData = repoResponse.data;
 
-    // Recursive function to find all package.json files in the repository contents
-    const findAllPackageJsons = async (path) => {
-      const contentsResponse = await axios.get(
-        `${repoApiUrl}/contents/${path}`,
-        { headers }
-      );
+    // List of dependency configuration files to look for
+    const dependencyFiles = [
+      "package.json",        // JavaScript/Node.js
+      "requirements.txt",    // Python
+      "Gemfile",             // Ruby
+      "build.gradle",        // Java (Gradle)
+      "pom.xml",             // Java (Maven)
+      "Cargo.toml",          // Rust
+      "composer.json",       // PHP
+    ];
+
+    // Recursive function to find all specified dependency files in the repository contents
+    const findAllDependencyFiles = async (path) => {
+      const contentsResponse = await axios.get(`${repoApiUrl}/contents/${path}`, { headers });
       const contents = contentsResponse.data;
 
-      let foundPackageJsons = []; // Array to hold all found package.json URLs
+      let foundDependencyFiles = []; // Array to hold all found dependency files' URLs
 
       for (const file of contents) {
-        if (file.type === "file" && file.name === "package.json") {
-          foundPackageJsons.push(file.download_url); // Add the download URL to the array
+        if (file.type === "file" && dependencyFiles.includes(file.name)) {
+          foundDependencyFiles.push({
+            name: file.name,
+            url: file.download_url
+          }); // Add the file details to the array
         }
         if (file.type === "dir") {
           // Recursively search in subdirectories
-          const found = await findAllPackageJsons(`${path}/${file.name}`);
-          foundPackageJsons = foundPackageJsons.concat(found); // Merge results
+          const found = await findAllDependencyFiles(`${path}/${file.name}`);
+          foundDependencyFiles = foundDependencyFiles.concat(found); // Merge results
         }
       }
-      return foundPackageJsons; // Return all found package.json URLs
+      return foundDependencyFiles; // Return all found dependency files' details
     };
 
-    // Start searching for package.json from the root directory
-    const packageJsonUrls = await findAllPackageJsons("");
-    const packageJsonDataArray = [];
+    // Start searching for dependency files from the root directory
+    const dependencyFileUrls = await findAllDependencyFiles("");
+    const dependencyDataArray = [];
 
-    for (const packageJsonUrl of packageJsonUrls) {
-      const packageJsonResponse = await axios.get(packageJsonUrl, { headers });
-      const packageJsonData = packageJsonResponse.data;
+    // Fetch the contents of each found dependency file
+    for (const dependencyFile of dependencyFileUrls) {
+      const dependencyResponse = await axios.get(dependencyFile.url, { headers });
+      const dependencyContent = dependencyResponse.data;
 
-      // Extract dependencies
-      const dependencies = packageJsonData.dependencies || {};
-      const devDependencies = packageJsonData.devDependencies || {};
-
-      packageJsonDataArray.push({
-        url: packageJsonUrl,
-        dependencies,
-        devDependencies,
-      });
+      // Process the content as JSON for known JSON files or as text for others
+      if ((dependencyFile.name === "package.json" || dependencyFile.name === "composer.json") && typeof dependencyContent === "object") {
+        // If content is already an object, use it directly; otherwise, parse it
+        const parsedData = dependencyContent;
+        dependencyDataArray.push({
+          file: dependencyFile.name,
+          dependencies: parsedData.dependencies || {},
+          devDependencies: parsedData.devDependencies || {},
+        });
+      } else if (typeof dependencyContent === "string" && dependencyFile.name.endsWith(".json")) {
+        try {
+          const parsedData = JSON.parse(dependencyContent);
+          dependencyDataArray.push({
+            file: dependencyFile.name,
+            dependencies: parsedData.dependencies || {},
+            devDependencies: parsedData.devDependencies || {},
+          });
+        } catch (parseError) {
+          console.error(`Error parsing JSON for ${dependencyFile.name}:`, parseError.message);
+          dependencyDataArray.push({
+            file: dependencyFile.name,
+            error: "Invalid JSON format",
+          });
+        }
+      } else {
+        // For other file types, return raw content
+        dependencyDataArray.push({
+          file: dependencyFile.name,
+          content: dependencyContent,
+        });
+      }
     }
 
-    // Return essential repository information along with all found package.json data
+    // Return essential repository information along with all found dependency files data
     return {
       name: repoData.name,
       description: repoData.description,
       language: repoData.language,
-      packageJsons: packageJsonDataArray, // Array of all package.json data
+      dependencies: dependencyDataArray, // Array of all found dependency data
     };
   } catch (error) {
     if (error.response) {
