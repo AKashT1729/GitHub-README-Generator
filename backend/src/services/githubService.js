@@ -17,6 +17,10 @@ const fetchRepoData = async (repoUrl) => {
     const repoResponse = await axios.get(repoApiUrl, { headers });
     const repoData = repoResponse.data;
 
+    // Fetch all programming languages used in the repository
+    const languagesResponse = await axios.get(`${repoApiUrl}/languages`, { headers });
+    const languagesData = languagesResponse.data;
+
     // List of dependency configuration files to look for
     const dependencyFiles = [
       "package.json",        // JavaScript/Node.js
@@ -97,7 +101,8 @@ const fetchRepoData = async (repoUrl) => {
     return {
       name: repoData.name,
       description: repoData.description,
-      language: repoData.language,
+      primaryLanguage: repoData.language,
+      languages: languagesData, // Object containing all languages used and their byte sizes
       dependencies: dependencyDataArray, // Array of all found dependency data
     };
   } catch (error) {

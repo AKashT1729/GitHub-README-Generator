@@ -10,9 +10,7 @@ const generateReadme = async (req, res) => {
 
     // Generate README content using OpenAI
     // const readmeContent = await generateReadmeAI(repoData);
-    console.log(repoData);
-
-    // res.status(200).json({ readme: readmeContent });
+     res.status(200).json({ readme: repoData });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
