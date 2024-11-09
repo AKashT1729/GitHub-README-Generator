@@ -1,23 +1,27 @@
-import openai from '../config/openaiConfig.js'
+import openai from "../config/openaiConfig.js";
 
 const generateReadmeAI = async (repoData) => {
-    try {
-        // Create a prompt using repository data
-        const prompt = `Generate a README.md for a project with the following details:
-        Project Name: ${repoData.name}
-        Description: ${repoData.description}
-        Language: ${repoData.language}`;
+  try {
+    // Create a prompt using repository data
+    const prompt = `Generate a README.md for a project with the following details:
+         ${JSON.stringify(repoData)}`;
 
-        const response = await openai.createCompletion({
-            model: 'text-davinci-003',
-            prompt,
-            max_tokens: 500,
-        });
+    const response = await openai.chat.completions.create({
+      model: "gpt-3.5-turbo",
+      prompt: prompt,
+      temperature: 0.4,
+      max_tokens: 64,
+    });
+    console.log(response);
 
-        return response.data.choices[0].text;
-    } catch (error) {
-        throw new Error('Error generating README using OpenAI API');
-    }
+    return response.data.choices[0].text;
+  } catch (error) {
+    console.error(
+      "Error details:",
+      error.response ? error.response.data : error.message
+    );
+    throw new Error("Error generating README using OpenAI API");
+  }
 };
 
 export default generateReadmeAI;

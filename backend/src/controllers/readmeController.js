@@ -1,5 +1,5 @@
 import fetchRepoData from "../services/githubService.js";
-// import generateReadmeAI from '../services/openaiService.js';
+import generateReadmeAI from "../services/openaiService.js";
 
 const generateReadme = async (req, res) => {
   const { repoUrl } = req.body;
@@ -9,8 +9,8 @@ const generateReadme = async (req, res) => {
     const repoData = await fetchRepoData(repoUrl);
 
     // Generate README content using OpenAI
-    // const readmeContent = await generateReadmeAI(repoData);
-     res.status(200).json({ readme: repoData });
+    const readmeContent = await generateReadmeAI(repoData);
+    res.status(200).json({ readme: readmeContent });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
