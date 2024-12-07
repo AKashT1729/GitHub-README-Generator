@@ -1,4 +1,4 @@
-import genAI from "../config/openaiConfig.js";
+import genAI from "../config/geminiAiConfig.js";
 
 const generateReadmeAI = async (repoData) => {
   try {
@@ -7,11 +7,11 @@ const generateReadmeAI = async (repoData) => {
          ${JSON.stringify(repoData)}`;
     // console.log(prompt);
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    
-    const result = await model.generateContent(prompt)
+
+    const result = await model.generateContent(prompt);
     // console.log(result.response.text());
 
-    return result.response.text()
+    return result.response.text();
   } catch (error) {
     console.error(
       "Error details:",

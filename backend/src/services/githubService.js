@@ -18,23 +18,28 @@ const fetchRepoData = async (repoUrl) => {
     const repoData = repoResponse.data;
 
     // Fetch all programming languages used in the repository
-    const languagesResponse = await axios.get(`${repoApiUrl}/languages`, { headers });
+    const languagesResponse = await axios.get(`${repoApiUrl}/languages`, {
+      headers,
+    });
     const languagesData = languagesResponse.data;
 
     // List of dependency configuration files to look for
     const dependencyFiles = [
-      "package.json",        // JavaScript/Node.js
-      "requirements.txt",    // Python
-      "Gemfile",             // Ruby
-      "build.gradle",        // Java (Gradle)
-      "pom.xml",             // Java (Maven)
-      "Cargo.toml",          // Rust
-      "composer.json",       // PHP
+      "package.json", // JavaScript/Node.js
+      "requirements.txt", // Python
+      "Gemfile", // Ruby
+      "build.gradle", // Java (Gradle)
+      "pom.xml", // Java (Maven)
+      "Cargo.toml", // Rust
+      "composer.json", // PHP
     ];
 
     // Recursive function to find all specified dependency files in the repository contents
     const findAllDependencyFiles = async (path) => {
-      const contentsResponse = await axios.get(`${repoApiUrl}/contents/${path}`, { headers });
+      const contentsResponse = await axios.get(
+        `${repoApiUrl}/contents/${path}`,
+        { headers }
+      );
       const contents = contentsResponse.data;
 
       let foundDependencyFiles = []; // Array to hold all found dependency files' URLs
@@ -43,7 +48,7 @@ const fetchRepoData = async (repoUrl) => {
         if (file.type === "file" && dependencyFiles.includes(file.name)) {
           foundDependencyFiles.push({
             name: file.name,
-            url: file.download_url
+            url: file.download_url,
           }); // Add the file details to the array
         }
         if (file.type === "dir") {
@@ -61,11 +66,17 @@ const fetchRepoData = async (repoUrl) => {
 
     // Fetch the contents of each found dependency file
     for (const dependencyFile of dependencyFileUrls) {
-      const dependencyResponse = await axios.get(dependencyFile.url, { headers });
+      const dependencyResponse = await axios.get(dependencyFile.url, {
+        headers,
+      });
       const dependencyContent = dependencyResponse.data;
 
       // Process the content as JSON for known JSON files or as text for others
-      if ((dependencyFile.name === "package.json" || dependencyFile.name === "composer.json") && typeof dependencyContent === "object") {
+      if (
+        (dependencyFile.name === "package.json" ||
+          dependencyFile.name === "composer.json") &&
+        typeof dependencyContent === "object"
+      ) {
         // If content is already an object, use it directly; otherwise, parse it
         const parsedData = dependencyContent;
         dependencyDataArray.push({
@@ -73,7 +84,10 @@ const fetchRepoData = async (repoUrl) => {
           dependencies: parsedData.dependencies || {},
           devDependencies: parsedData.devDependencies || {},
         });
-      } else if (typeof dependencyContent === "string" && dependencyFile.name.endsWith(".json")) {
+      } else if (
+        typeof dependencyContent === "string" &&
+        dependencyFile.name.endsWith(".json")
+      ) {
         try {
           const parsedData = JSON.parse(dependencyContent);
           dependencyDataArray.push({
@@ -82,7 +96,10 @@ const fetchRepoData = async (repoUrl) => {
             devDependencies: parsedData.devDependencies || {},
           });
         } catch (parseError) {
-          console.error(`Error parsing JSON for ${dependencyFile.name}:`, parseError.message);
+          console.error(
+            `Error parsing JSON for ${dependencyFile.name}:`,
+            parseError.message
+          );
           dependencyDataArray.push({
             file: dependencyFile.name,
             error: "Invalid JSON format",
