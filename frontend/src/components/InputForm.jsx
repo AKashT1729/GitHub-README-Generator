@@ -22,7 +22,7 @@ const InputForm = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/generate-readme",
+        "https://github-readme-generator-backend.onrender.com/api/generate-readme",
         { repoUrl: repoLink }
       );
 
