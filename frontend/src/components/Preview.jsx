@@ -17,19 +17,21 @@ const Preview = ({ repoData }) => {
 
   return (
     <div className="max-w-xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md mt-10 border-gray-200 dark:border-gray-700">
-      <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
-        Create readme.md file and paste it here 
-        
+      <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
+      Generate a README.md file and include the following content within it. 
       </h2>
-      <div className="relative mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
+      <div className="relative mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg max-h-96 overflow-y-auto">
         {/* Absolute positioned Copy button in the top-right corner */}
         <button
           onClick={copyToClipboard}
-          className="absolute top-0 right-2 px-3 py-1 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition"
+          className="absolute top-0 right-2 px-3 py-1 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition "
         >
           Copy
         </button>
-        <p className="text-gray-800 dark:text-gray-300">{repoData}</p>
+        {/* Ensure content is scrollable */}
+        <p className="text-gray-800 dark:text-gray-300 whitespace-pre-wrap">
+          {repoData}
+        </p>
       </div>
     </div>
   );
